@@ -1,0 +1,16 @@
+---
+title: "p8105_hw5_lz2949"
+author: "Longyi Zhao"
+date: "2023-11-03"
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+```
+
+## Problem 1
+```{r}
+homi_data = read_csv(file = "./data/homicide-data.csv")
+```
+
