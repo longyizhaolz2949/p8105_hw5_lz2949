@@ -7,10 +7,45 @@ output: github_document
 
 ```{r}
 library(tidyverse)
+library(broom)
 ```
 
 ## Problem 1
 ```{r}
 homi_data = read_csv(file = "./data/homicide-data.csv")
+```
+
+```{r}
+# Create a city_state variable
+homi_data  = 
+  homi_data |>
+  mutate(city_state = paste(city,state,sep = ", "))
+
+# summary and count number of homicides 
+summary_data = homi_data |>
+  group_by(city_state) |>
+  summarise(
+    homi_solved = sum(disposition == 'Closed by arrest'),
+    homi_unsolved = sum(disposition == 'Open/No arrest' | disposition == 'Closed without arrest')
+  )
+
+```
+Description: 
+
+```{r}
+# in 'Baltimore, MD' estimate the proportion of homicides that are unsolved. 
+balt_md = summary_data |>
+  filter(city_state == "Baltimore, MD") |>
+  mutate(sum_homi = sum(homi_solved, homi_unsolved)) |>
+  do ({prop.test(.$homi_unsolved, .$sum_homi) |>
+  broom::tidy() })|>
+  select(estimate, conf.low, conf.high) |>
+  mutate(city_state = "Baltimore, MD") 
+```
+
+```{r}
+# run prop.test for each of the cities in the dataset
+
+
 ```
 
