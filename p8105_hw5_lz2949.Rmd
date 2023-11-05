@@ -9,6 +9,7 @@ output: github_document
 library(tidyverse)
 library(broom)
 library(ggplot2)
+library(rvest)
 ```
 
 ## Problem 1
@@ -112,3 +113,63 @@ ggplot(tidy_data,
 description: 
 
 ## Problem 3
+Conduct a simulation to explore power in a one-sample t-test
+```{r}
+# fix two design elements
+# alpha = 0.95
+# H0, true mean is equal to 0 
+n = 30
+sigma = 5
+set.seed(12345)
+
+# set mu = 0 and generate 5000 datasets from the model x~norm(mu, sigma)
+mu = 0
+
+output = vector("list", length= 5000)
+
+for (i in 1:5000) {
+  sample_data = rnorm(n, mean = mu, sd = sigma)
+  output[[i]] = t.test(sample_data, mu = 0) |>
+    broom::tidy()
+}
+
+sim_results = output |>
+  bind_rows() |>
+  select(estimate, p.value) |>
+  mutate(mu = 0) 
+```
+
+```{r}
+# repeat the result for mu = {1,2,3,4,5,6}
+simulate_mu = function(mu) {
+  output_onesix = vector("list", length = 5000)
+
+  for (i in 1:5000) {
+    sample_data_onesix = rnorm(n, mean = mu, sd = sigma)
+    output_onesix[[i]] = t.test(sample_data_onesix, mu = 0) |> 
+      broom::tidy()
+  }
+
+  sim_results_onesix = output_onesix |> 
+    bind_rows() |> 
+    select(estimate, p.value) |>
+    mutate(mu = mu)
+  return(sim_results_onesix)
+}
+
+mu_onesix = c(1,2,3,4,5,6)
+results_onesix = map(mu_onesix, simulate_mu) |>
+  bind_rows() 
+
+```
+
+Make a plot showing the proportion of times the null was rejected on the y axis and true value of mu on the x axis
+Description: 
+
+Make a plot showing the average estimate of mu_hat on the y axis and true value of mu on the x axis. 
+
+Make a plot on showing the average estimate of mu_hat only in samples for which the null was rejected on the y axis and the true value of mu on the x axis. 
+Description 
+
+
+
