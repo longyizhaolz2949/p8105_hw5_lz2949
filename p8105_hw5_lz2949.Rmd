@@ -8,6 +8,7 @@ output: github_document
 ```{r}
 library(tidyverse)
 library(broom)
+library(ggplot2)
 ```
 
 ## Problem 1
@@ -44,8 +45,33 @@ balt_md = summary_data |>
 ```
 
 ```{r}
-# run prop.test for each of the cities in the dataset
+# run prop.test for each of the city
+result_df <- summary_data |>
+  group_by(city_state) |>
+  summarize(prop_test_results = map(homi_unsolved, ~ prop.test(.x, .x +homi_solved) |>
+  broom::tidy())) |>
+  unnest(prop_test_results) |>
+  select(city_state, estimate, conf.low, conf.high) 
 
-
+print(result_df)
 ```
+
+```{r}
+ggplot(result_df, aes(x = city_state, 
+                      y = estimate, 
+                      color = city_state
+                      )) +
+  geom_point(size = 2) +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2) +
+  labs(
+    title = "Estimated Proportions and Confidence Intervals by City",
+    x = "City",
+    y = "Estimated Proportion of Unsolved Homicides"
+  ) +
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) +
+  theme(legend.position = "none")
+
+# drop legend?
+```
+
 
