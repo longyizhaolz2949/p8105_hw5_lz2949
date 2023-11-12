@@ -9,7 +9,6 @@ output: github_document
 library(tidyverse)
 library(broom)
 library(ggplot2)
-library(rvest)
 ```
 
 ## Problem 1
@@ -110,7 +109,7 @@ ggplot(tidy_data,
   ) +
   theme(axis.text.x = element_text(angle = 60, hjust = 1))
 ```
-description: 
+Description: In the control group, though each participant has some fluctuations in 8 weeks, values are generally stable, no clear trend of increasing or decreasing. The average value of 10 participants in control group at week 1 is `r mean(tidy_data |>filter(test_arm == "con", time == "week_1") |>pull(value))`; the average value of 10 participants in control group at week 8 is `r mean(tidy_data |>filter(test_arm == "con", time == "week_8") |>pull(value))`. In the experiment group, there is a clear increasing trend as time passed: at week 1, the average value is `r mean(tidy_data |>filter(test_arm == "exp", time == "week_1") |>pull(value))`; at week 8, the average value is `r mean(tidy_data |>filter(test_arm == "exp", time == "week_8") |>pull(value))`. 
 
 ## Problem 3
 Conduct a simulation to explore power in a one-sample t-test
